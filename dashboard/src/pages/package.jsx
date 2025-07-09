@@ -3,6 +3,9 @@ import {useState,useEffect} from 'react';
 
 export default function PackagePage() {
     const [data,setData]=useState(null);
+    const [showdata,setshowdata]=useState(null);
+    const [search,setSearch]=useState("");
+    const [searchdata,setSearchdata]=useState(null);
     useEffect(()=>{
         fetch('/summary.json').then((response)=>{
             return response.json();
@@ -10,8 +13,46 @@ export default function PackagePage() {
             setData(dataa)
         }).catch((error)=>{console.log(error)})
     },[])
+    useEffect(()=>{
+        if(data && data.length>0){
+        const filterdata= data.map((items,index)=>{
+            return(
+                {
+                    id:index+1,
+                    packageName:items.packageName,
+                    biBuild:"true",
+                    ciBuild:"true",
+                    imageBuild:"true",
+                    binaryBuild:"true",
+                    packageOwner:items.owner,
+                    verification:items.verification,
+                    distrosucc:items.distroSuccess,
+                    distrofail:items.distroFailure,
+                }
+            )
+        })
+        setshowdata(filterdata);
+        setSearchdata(filterdata); // initially show all
+    }
+
+    },[data])
+
+    useEffect(()=>{
+        if(search!==""){
+            const searchdata= showdata.filter((item)=>{
+                return item.packageName.toLowerCase().includes(search.toLowerCase());
+            });
+            setSearchdata(searchdata);
+
+        }
+        else{
+            setSearchdata(showdata); // reset to full list if search is cleared
+        }
+    },[search])
+
+
     return (
-        <div className="flex flex-col bg-white h-[50vh] m-5">
+        <div className="flex flex-col bg-white h-[50vh] m-5 mb-10">
         {/* <ul>
 
         {
@@ -22,33 +63,162 @@ export default function PackagePage() {
         </ul> */}
         <div className="flex flex-row items-center justify-between p-5 border-gray-200 border-b-2">
             <p>All Packages</p>
-            <input placeholder="search" className=" text-center rounded-xl bg-gray-200 border-gray-200 border-b-2 "></input>
+            <input placeholder="search" value={search} className=" text-center rounded-xl bg-gray-200 border-gray-200 border-b-2 " onChange={(e)=>{setSearch(e.target.value)}}></input>
         </div>
-        <div className="text-sm flex flex-row items-center bg-gray-100 h-[6vh] justify-around ">
-            <div>Sr no.</div>
-            <div>Package Name </div>
-            <div>BI Build</div>
-            <div>CI Build</div>
-            <div>Image Build</div>
-            <div>Binary Build</div>
-            <div>Package Owner</div>
+       
+        <div className="text-xs text-center flex flex-row items-center bg-gray-200 h-[6vh] justify-between py-5 px-4 font-semibold text-ellipsis">
+  <div className="w-[6%]">Sr no.</div>
+  <div className="w-[19%]">Package Name</div>
+  <div className="w-[10%]">BI Build</div>
+  <div className="w-[10%]">CI Build</div>
+  <div className="w-[10%]">Image Build</div>
+  <div className="w-[10%]">Binary Build</div>
+  <div className="w-[20%]">Package Owner</div>
+</div>
 
+<div className="flex flex-col h-full w-full">
+  {
+    search==="" && showdata  ?(
+      showdata.map((items, index) => (
+        <div
+          key={items.id || index}
+          className="text-sm text-center flex flex-row items-center bg-white h-[10vh] py-5 justify-between px-4 border-b"
+        >
+          <div className="w-[6%]">{index + 1}</div>
+          <div className="w-[19%]">{items.packageName}</div>
+          <div className="w-[10%]">{items.biBuild}</div>
+          <div className="w-[10%]">{items.ciBuild}</div>
+          <div className="w-[10%]">{items.imageBuild}</div>
+          <div className="w-[10%]">{items.binaryBuild }</div>
+          <div className="w-[20%]">{items.packageOwner}</div>
         </div>
-        <div className="flex flex-col h-full">
-            
-            {
-                data?data.map((items,index)=>{
-                    <div key={items.id} className="text-sm flex flex-row items-center bg-gray-100 h-[5vh] justify-around ">
-                    <p>{items.id}</p>
-                    <p>{items.packageName}</p>
-                    <p>{items.packageName}</p>
-                    </div>        
-                }):<div>no data found</div>
-            }
-        
+      ))
+    ):
+      ( searchdata && searchdata.length > 0) ?
+        searchdata.map((items, index) => (
+        <div
+          key={items.id || index}
+          className="text-sm text-center flex flex-row items-center bg-white h-[10vh] py-5 justify-between px-4 border-b"
+        >
+          <div className="w-[6%]">{index + 1}</div>
+          <div className="w-[19%]">{items.packageName}</div>
+          <div className="w-[10%]">{items.biBuild}</div>
+          <div className="w-[10%]">{items.ciBuild}</div>
+          <div className="w-[10%]">{items.imageBuild}</div>
+          <div className="w-[10%]">{items.binaryBuild }</div>
+          <div className="w-[20%]">{items.packageOwner}</div>
         </div>
+      )):(
+      <div className="p-4 text-gray-500">No data found</div>
+    )
+
+
+    
+    
+}
+
+ 
+  
+  
+</div>
+
 
         
         </div>
     );
 }
+
+
+// import React, { useState, useEffect } from 'react';
+
+// export default function PackagePage() {
+//   const [data, setData] = useState(null);
+//   const [showdata, setShowdata] = useState(null);
+//   const [searchdata, setSearchdata] = useState(null);
+//   const [search, setSearch] = useState("");
+
+//   // Fetching data
+//   useEffect(() => {
+//     fetch('/summary.json')
+//       .then((response) => response.json())
+//       .then((dataa) => setData(dataa))
+//       .catch((error) => console.log(error));
+//   }, []);
+
+//   // Preparing mapped showdata
+//   useEffect(() => {
+//     if (data && data.length > 0) {
+//       const filterdata = data.map((items, index) => ({
+//         id: index + 1,
+//         packageName: items.packageName,
+//         biBuild: "true",
+//         ciBuild: "true",
+//         imageBuild: "true",
+//         binaryBuild: "true",
+//         packageOwner: items.owner
+//       }));
+//       setShowdata(filterdata);
+//       setSearchdata(filterdata); // initially show all
+//     }
+//   }, [data]);
+
+//   // Search filtering
+//   useEffect(() => {
+//     if (search !== "") {
+//       const filtered = showdata?.filter((item) =>
+//         item.packageName.toLowerCase().includes(search.toLowerCase())
+//       );
+//       setSearchdata(filtered);
+//     } else {
+//       setSearchdata(showdata); // reset to full list if search is cleared
+//     }
+//   }, [search, showdata]);
+
+//   return (
+//     <div className="flex flex-col bg-white h-[50vh] m-5 mb-10">
+//       {/* Header + Search Input */}
+//       <div className="flex flex-row items-center justify-between p-5 border-gray-200 border-b-2">
+//         <p>All Packages</p>
+//         <input
+//           placeholder="Search package name"
+//           value={search}
+//           className="text-center rounded-xl bg-gray-200 border-gray-200 border-b-2 px-3 py-1"
+//           onChange={(e) => setSearch(e.target.value)}
+//         />
+//       </div>
+
+//       {/* Table Headers */}
+//       <div className="text-xs text-center flex flex-row items-center bg-gray-200 h-[6vh] justify-between py-5 px-4 font-semibold text-ellipsis">
+//         <div className="w-[6%]">Sr no.</div>
+//         <div className="w-[19%]">Package Name</div>
+//         <div className="w-[10%]">BI Build</div>
+//         <div className="w-[10%]">CI Build</div>
+//         <div className="w-[10%]">Image Build</div>
+//         <div className="w-[10%]">Binary Build</div>
+//         <div className="w-[20%]">Package Owner</div>
+//       </div>
+
+//       {/* Table Rows */}
+//       <div className="flex flex-col h-full w-full">
+//         {searchdata && searchdata.length > 0 ? (
+//           searchdata.map((items, index) => (
+//             <div
+//               key={items.id || index}
+//               className="text-sm text-center flex flex-row items-center bg-white h-[10vh] py-5 justify-between px-4 border-b"
+//             >
+//               <div className="w-[6%]">{index + 1}</div>
+//               <div className="w-[19%]">{items.packageName}</div>
+//               <div className="w-[10%]">{items.biBuild}</div>
+//               <div className="w-[10%]">{items.ciBuild}</div>
+//               <div className="w-[10%]">{items.imageBuild}</div>
+//               <div className="w-[10%]">{items.binaryBuild}</div>
+//               <div className="w-[20%]">{items.packageOwner}</div>
+//             </div>
+//           ))
+//         ) : (
+//           <div className="p-4 text-gray-500 text-center">No matching packages found</div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
