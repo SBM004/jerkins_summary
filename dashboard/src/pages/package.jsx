@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import Passed from '../assets/passed.jsx';
 import Failedr from '../assets/failedr.jsx';
 import Search from '../assets/searchi.jsx';
+import Failedy from '../assets/failedy.jsx';
+import Failedb from '../assets/failedb.jsx';
 export default function PackagePage() {
   const [data, setData] = useState(null);
   const [showdata, setshowdata] = useState(null);
@@ -28,7 +30,7 @@ export default function PackagePage() {
             binaryBuild: "true",
             packageOwner: items.owner,
             verification: items.verification,
-
+            
             distrosucc: items.distroSuccess,
             distrofail: items.distroFailure,
           }
@@ -52,7 +54,6 @@ export default function PackagePage() {
       setSearchdata(showdata); // reset to full list if search is cleared
     }
   }, [search])
-
 
   return (
     <div className="flex flex-col bg-white h-[50vh] m-5 mx-10 mb-10">
@@ -98,10 +99,10 @@ export default function PackagePage() {
                 {/* for now i have done same condition for ci and image after asking the proper critera make some changes */}
                 <div className="w-[6%]">{index + 1}</div>
                 <div className="w-[19%]">{items.packageName}</div>
-                <div className="w-[10%]">{items.biBuild}</div>
                 <div className="w-[10%]" style={{ height: "2vh" }}>{items.distrofail === "" ? <Passed /> : <Failedr />}</div>
+                <div className="w-[10%]">{items.ciBuild}</div>
+                <div className="w-[10%]">{items.distrosucc.toLowerCase().includes("image") ? <Passed /> : <Failedr />}</div>
                 <div className="w-[10%]" style={{ height: "2vh" }}>{items.distrofail === "" ? <Passed /> : <Failedr />}</div>
-                <div className="w-[10%]">{items.binaryBuild}</div>
                 <div className="w-[20%]">{items.packageOwner}</div>
               </div>
             ))
