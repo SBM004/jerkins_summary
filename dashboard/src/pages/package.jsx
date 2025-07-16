@@ -2,20 +2,31 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import Passed from '../assets/passed.jsx';
 import Failedr from '../assets/failedr.jsx';
+import {Ci_check} from '../checkStatus/cibuild.jsx';
 import Search from '../assets/searchi.jsx';
-import Failedy from '../assets/failedy.jsx';
-import Failedb from '../assets/failedb.jsx';
+
+
 export default function PackagePage() {
   const [data, setData] = useState(null);
   const [showdata, setshowdata] = useState(null);
   const [search, setSearch] = useState("");
   const [searchdata, setSearchdata] = useState(null);
   useEffect(() => {
-    fetch('/summary.json').then((response) => {
-      return response.json();
+     fetch('http://localhost:3000/data').then((response) => {
+      return response.json()
+      //  console.log(response)
     }).then((dataa) => {
       setData(dataa)
-    }).catch((error) => { console.log(error) })
+      console.log(dataa)
+    }).catch((error) => { 
+      console.log(error) 
+    })
+
+    // fetch('http://localhost:3000/ci_check/packages').then(response=>{
+    //   console.log(response)
+    // }).catch(error=>{
+    //   console.log(error)
+    // })
   }, [])
   useEffect(() => {
     if (data && data.length > 0) {
@@ -30,7 +41,7 @@ export default function PackagePage() {
             binaryBuild: "true",
             packageOwner: items.owner,
             verification: items.verification,
-            
+            ciJob:items.ciJob,
             distrosucc: items.distroSuccess,
             distrofail: items.distroFailure,
           }
@@ -100,7 +111,7 @@ export default function PackagePage() {
                 <div className="w-[6%]">{index + 1}</div>
                 <div className="w-[19%]">{items.packageName}</div>
                 <div className="w-[10%]" style={{ height: "2vh" }}>{items.distrofail === "" ? <Passed /> : <Failedr />}</div>
-                <div className="w-[10%]">{items.ciBuild}</div>
+                <div className="w-[10%]">{<Ci_check ciJob={items.ciJob}/>}</div>
                 <div className="w-[10%]">{items.distrosucc.toLowerCase().includes("image") ? <Passed /> : <Failedr />}</div>
                 <div className="w-[10%]" style={{ height: "2vh" }}>{items.distrofail === "" ? <Passed /> : <Failedr />}</div>
                 <div className="w-[20%]">{items.packageOwner}</div>
