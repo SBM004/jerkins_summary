@@ -1,10 +1,9 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
-import Passed from '../assets/passed.jsx';
-import Failedr from '../assets/failedr.jsx';
-import {Ci_check} from '../checkStatus/cibuild.jsx';
-import Search from '../assets/searchi.jsx';
-
+import React from "react";
+import { useState, useEffect } from "react";
+import Passed from "../assets/passed.jsx";
+import Failedr from "../assets/failedr.jsx";
+import { Ci_check } from "../checkStatus/cibuild.jsx";
+import Search from "../assets/searchi.jsx";
 
 export default function PackagePage() {
   const [data, setData] = useState(null);
@@ -12,46 +11,46 @@ export default function PackagePage() {
   const [search, setSearch] = useState("");
   const [searchdata, setSearchdata] = useState(null);
   useEffect(() => {
-     fetch('http://localhost:3000/data').then((response) => {
-      return response.json()
-      //  console.log(response)
-    }).then((dataa) => {
-      setData(dataa)
-      console.log(dataa)
-    }).catch((error) => { 
-      console.log(error) 
-    })
+    fetch("http://localhost:3000/data")
+      .then((response) => {
+        return response.json();
+        //  console.log(response)
+      })
+      .then((dataa) => {
+        setData(dataa);
+        console.log(dataa);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
     // fetch('http://localhost:3000/ci_check/packages').then(response=>{
     //   console.log(response)
     // }).catch(error=>{
     //   console.log(error)
     // })
-  }, [])
+  }, []);
   useEffect(() => {
     if (data && data.length > 0) {
       const filterdata = data.map((items, index) => {
-        return (
-          {
-            id: index + 1,
-            packageName: items.packageName,
-            biBuild: "true",
-            ciBuild: "true",
-            imageBuild: "true",
-            binaryBuild: "true",
-            packageOwner: items.owner,
-            verification: items.verification,
-            ciJob:items.ciJob,
-            distrosucc: items.distroSuccess,
-            distrofail: items.distroFailure,
-          }
-        )
-      })
+        return {
+          id: index + 1,
+          packageName: items.packageName,
+          biBuild: "true",
+          ciBuild: "true",
+          imageBuild: "true",
+          binaryBuild: "true",
+          packageOwner: items.owner,
+          verification: items.verification,
+          ciJob: items.ciJob,
+          distrosucc: items.distroSuccess,
+          distrofail: items.distroFailure,
+        };
+      });
       setshowdata(filterdata);
       setSearchdata(filterdata); // initially show all
     }
-
-  }, [data])
+  }, [data]);
 
   useEffect(() => {
     if (search !== "") {
@@ -59,12 +58,10 @@ export default function PackagePage() {
         return item.packageName.toLowerCase().includes(search.toLowerCase());
       });
       setSearchdata(searchdata);
-
-    }
-    else {
+    } else {
       setSearchdata(showdata); // reset to full list if search is cleared
     }
-  }, [search])
+  }, [search]);
 
   return (
     <div className="flex flex-col bg-white h-[50vh] m-5 mx-10 mb-10">
@@ -83,7 +80,9 @@ export default function PackagePage() {
             placeholder="search for package..."
             value={search}
             className="text-left rounded-xl bg-gray-200 border-gray-200 border-b-2 pl-10 pr-4"
-            onChange={(e) => { setSearch(e.target.value) }}
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
           />
           <Search />
         </div>
@@ -100,58 +99,54 @@ export default function PackagePage() {
       </div>
 
       <div className="flex flex-col h-full w-full">
-        {
-          search === "" && showdata ? (
-            showdata.map((items, index) => (
-              <div
-                key={items.id || index}
-                className="text-sm text-center flex flex-row items-center bg-white h-[10vh] py-5 justify-between px-4 border-b"
-              >
-                {/* for now i have done same condition for ci and image after asking the proper critera make some changes */}
-                <div className="w-[6%]">{index + 1}</div>
-                <div className="w-[19%]">{items.packageName}</div>
-                <div className="w-[10%]" style={{ height: "2vh" }}>{items.distrofail === "" ? <Passed /> : <Failedr />}</div>
-                <div className="w-[10%]">{<Ci_check ciJob={items.ciJob}/>}</div>
-                <div className="w-[10%]">{items.distrosucc.toLowerCase().includes("image") ? <Passed /> : <Failedr />}</div>
-                <div className="w-[10%]" style={{ height: "2vh" }}>{items.distrofail === "" ? <Passed /> : <Failedr />}</div>
-                <div className="w-[20%]">{items.packageOwner}</div>
+        {search === "" && showdata ? (
+          showdata.map((items, index) => (
+            <div
+              key={items.id || index}
+              className="text-sm text-center flex flex-row items-center bg-white h-[10vh] py-5 justify-between px-4 border-b"
+            >
+              {/* for now i have done same condition for ci and image after asking the proper critera make some changes */}
+              <div className="w-[6%]">{index + 1}</div>
+              <div className="w-[19%]">{items.packageName}</div>
+              <div className="w-[10%]" style={{ height: "2vh" }}>
+                {items.distrofail === "" ? <Passed /> : <Failedr />}
               </div>
-            ))
-          ) :
-            (searchdata && searchdata.length > 0) ?
-              searchdata.map((items, index) => (
-                <div
-                  key={items.id || index}
-                  className="text-sm text-center flex flex-row items-center bg-white h-[10vh] py-5 justify-between px-4 border-b"
-                >
-                  <div className="w-[6%]">{index + 1}</div>
-                  <div className="w-[19%]">{items.packageName}</div>
-                  <div className="w-[10%]">{items.biBuild}</div>
-                  <div className="w-[10%]">{items.ciBuild}</div>
-                  <div className="w-[10%]">{items.imageBuild}</div>
-                  <div className="w-[10%]">{items.binaryBuild}</div>
-                  <div className="w-[20%]">{items.packageOwner}</div>
-                </div>
-              )) : (
-                <div className="p-4 text-gray-500">No data found</div>
-              )
-
-
-
-
-        }
-
-
-
-
+              <div className="w-[10%]">{<Ci_check ciJob={items.ciJob} />}</div>
+              <div className="w-[10%]">
+                {items.distrosucc.toLowerCase().includes("image") ? (
+                  <Passed />
+                ) : (
+                  <Failedr />
+                )}
+              </div>
+              <div className="w-[10%]" style={{ height: "2vh" }}>
+                {items.distrofail === "" ? <Passed /> : <Failedr />}
+              </div>
+              <div className="w-[20%]">{items.packageOwner}</div>
+            </div>
+          ))
+        ) : searchdata && searchdata.length > 0 ? (
+          searchdata.map((items, index) => (
+            <div
+              key={items.id || index}
+              className="text-sm text-center flex flex-row items-center bg-white h-[10vh] py-5 justify-between px-4 border-b"
+            >
+              <div className="w-[6%]">{index + 1}</div>
+              <div className="w-[19%]">{items.packageName}</div>
+              <div className="w-[10%]">{items.biBuild}</div>
+              <div className="w-[10%]">{items.ciBuild}</div>
+              <div className="w-[10%]">{items.imageBuild}</div>
+              <div className="w-[10%]">{items.binaryBuild}</div>
+              <div className="w-[20%]">{items.packageOwner}</div>
+            </div>
+          ))
+        ) : (
+          <div className="p-4 text-gray-500">No data found</div>
+        )}
       </div>
-
-
-
     </div>
   );
 }
-
 
 // import React, { useState, useEffect } from 'react';
 

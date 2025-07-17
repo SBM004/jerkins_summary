@@ -1,16 +1,21 @@
-express=require('express')
-cors=require('cors')
-fs=require('fs')
-const path=require('path')
-router=express.Router()
-const dotenv=require('dotenv')
-dotenv.config()
-const port=process.env.PORT || 2000
-const app=express()
-const filepath=path.join(__dirname,'data','summary.json')
-const ci_route=require('./routes/CI_route')
-app.use(express.json())
-app.use(cors())
+import express from 'express';
+import cors from 'cors';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Manually define __dirname in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const router=express.Router();
+import dotenv from 'dotenv';
+dotenv.config();
+const port=process.env.PORT || 2000;
+const app=express();
+const filepath=path.join(__dirname,'data','summary.json');
+import router1 from './routes/CI_route.js';
+app.use(express.json());
+app.use(cors());
 
 app.get('/data',(req,res)=>{
     try{
@@ -62,7 +67,7 @@ app.get('/data',(req,res)=>{
 
 // app.use('/ci_checks/packages',ci_route)
 
-app.use('/api/ci',ci_route)
+app.use('/api/ci',router1)
 app.listen(port,()=>{
     // console.log(__dirname)
     console.log(`serever is ruuning in port ${port}`)

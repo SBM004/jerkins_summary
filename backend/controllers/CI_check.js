@@ -24,10 +24,14 @@
 // module.exports = ci_check;
 
 
-const express=require('express')
+import express from 'express';
+//import React, { useEffect, useState } from "react";
+//import Passed from "../assets/passed.jsx";
+//import Failedr from "../assets/failedr.jsx";
 // const fetch = require('node-fetch');
-const { URL } = require('url');
+import { URL } from 'url';
 console.log(typeof(fetch))
+//console.log("Received body:", req.body);
 // CI domain to platform mapping
 const ciDomainMap = {
   "github.com": "github",
@@ -128,7 +132,7 @@ async  github(url) {
         }
 
         const data = await res.json();
-        // console.log(data.workflow_runs[0])
+        console.log(data.workflow_runs[0]);
         return data.workflow_runs?.[0]?.conclusion || "Unknown";
     } catch (err) {
         return "GitHub Error: " + err.message;
@@ -153,13 +157,58 @@ async  github(url) {
   },
 
   async jenkins(url) {
+    /* 
     try {
-      const api = `${url.replace(/\/$/, "")}/api/json`;
-      const res = await fetch(api);
+      //jobUrl ="https://ibmz-ci.osuosl.org/job/TensorFlow_IBMZ_CI/";
+      const apiUrl = `${jobUrl}api/json?tree=color,lastBuild[result,number,timestamp]`
+      //const apiUrl = "https://ci-couchdb.apache.org/job/jenkins-cm1/job/FullPlatformMatrix/job/main/api/json?tree=color,lastBuild[result,number,timestamp]";
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.color.includes('blue')? "success" : "failed";
+      /*const response = await fetch('/jenkins/job/zookeeper-multi-branch-build-s390x/job/master/api/json?tree=color,lastBuild[result,number,timestamp]', {
+        method: 'GET',
+      })
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      return data.color.includes('red')? "success" : "failed";
+    } catch (error) {
+      console.error("Error checking CI job status:", error);
+      return "failed";
+    }
+    */
+    try {
+      //const apiUrl = `${url.replace(/\/$/, "")}/api/json?tree=color,lastBuild[result,number,timestamp]`;
+      console.log("Url from jenkins: ", url);
+      const apiUrl = `${url}/api/json?tree=color,lastBuild[result,number,timestamp]`;
+      //const res = await fetch(api);
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
       const data = await res.json();
-      return data.lastBuild?.result || "Unknown";
-    } catch (err) {
-      return "Jenkins Error: " + err.message;
+       return data.color && data.color.includes("blue") ? "success" : "failed";
+    } catch (error) {
+      console.error("Error checking CI job status:", error);
+      return "failed";
     }
   },
 
@@ -207,6 +256,47 @@ const ci_check = async (req, res) => {
     console.error("Error in ci_check:", err);
     return res.status(500).json({ status: "error", message: "Internal server error" });
   }
-};
+};/*
+export const ci_check = ({ ciJob }) => {
+  const [status, setStatus] = useState("loading");
 
-module.exports = ci_check;
+  useEffect(() => {
+    if (!ciJob || ciJob.trim() === "") {
+      setStatus("failed");
+      return;
+    }
+
+    const fetchStatus = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/ci", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ciJob }), // 👈 Must match backend
+        });
+
+        const data = await response.json();
+        console.log("CI Response:", data);
+
+        if (data.status === "failed") {
+          setStatus("failed");
+        } else {
+          setStatus("passed");
+        }
+      } catch (error) {
+        console.error("Error fetching CI status:", error);
+        setStatus("failed");
+      }
+    };
+
+    fetchStatus();
+  }, [ciJob]);
+
+  if (status === "loading") return <div>Checking...</div>;
+  if (status === "passed") return <Passed />;
+  return <Failedr />;
+};*/
+
+//module.exports = ci_check;
+export default ci_check;
