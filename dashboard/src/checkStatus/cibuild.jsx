@@ -41,13 +41,14 @@ import React, { useEffect, useState } from "react";
 import Passeds from "../assets/passed.jsx";
 import Failedr from "../assets/failedr.jsx";
 import Empty from "../assets/empty.jsx";
+import Running from "../assets/running.jsx";
 
 export const Ci_check = ({ ciJob }) => {
   const [status, setStatus] = useState("loading");
 
   useEffect(() => {
     if (!ciJob || ciJob.trim() === "") {
-      setStatus("failed");
+      setStatus("none");
       return;
     }
 
@@ -71,8 +72,9 @@ export const Ci_check = ({ ciJob }) => {
         } else if (data.status === "skipped") {
           setStatus("skipped");
         } else {
-          setStatus("none");
+          setStatus("notfound");
         }
+        /*data.color && data.color.includes("anime")*/
       } catch (error) {
         console.error("Fetch error:", error);
         setStatus("failed");
@@ -83,7 +85,8 @@ export const Ci_check = ({ ciJob }) => {
   }, [ciJob]);
 
   if (status === "none") return <Empty />;
-  if (status === "skipped") return <Empty/>;
+  if (status === "running") return <Running />;
+  if (status === "skipped" || status === "notfound") return <Failedr />;
   if (status === "passed") return <Passeds />;
   return <Failedr />;
 };

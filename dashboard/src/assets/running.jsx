@@ -1,6 +1,6 @@
 import React from "react";
-import empty from "../assets/empty.svg";
-export default function Empty() {
+import clock from "../assets/clock.svg";
+export default function Running() {
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
       <div
@@ -10,7 +10,7 @@ export default function Empty() {
           left: "2vw",
           top: 0,
           position: "absolute",
-          background: "rgba(138, 138, 138, 0.8)",
+          background: "rgba(107, 171, 255, 0.8)",
           borderRadius: 20,
         }}
       />
@@ -21,14 +21,14 @@ export default function Empty() {
           left: "2.5vw",
           top: "0vh",
           position: "absolute",
-          color: "#ffffffff",
+          color: "#0000ffff",
           fontSize: "clamp(6px, 1vw, 18px)",
           fontFamily: "JejuGothic",
           fontWeight: "400",
           wordWrap: "break-word",
         }}
       >
-        Empty
+        Running
       </div>
       <div
         style={{
@@ -39,17 +39,8 @@ export default function Empty() {
           position: "relative",
         }}
       >
-        <img src={empty} style={{ height: "2vh" }}></img>
+        <img src={clock} style={{ height: "2vh" }}></img>
       </div>
     </div>
   );
 }
-
-// lement.style {
-//     width: 10vw;
-//     height: 4.5vh;
-//     left: 0px;
-//     top: 0px;
-//     position: relative;
-//     background: rgba(0, 251, 8, 0.39);
-//     border-radius: 20px;

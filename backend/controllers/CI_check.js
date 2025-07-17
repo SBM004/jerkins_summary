@@ -40,6 +40,7 @@ const ciDomainMap = {
   "ci-builds.apache.org": "jenkins",
   "ci-couchdb.apache.org": "jenkins",
   "ci-hbase.apache.org": "jenkins",
+  "ibmz-ci.osuosl.org": "jenkins",
   "tigera.semaphoreci.com": "semaphore",
   "ci.hibernate.org": "jenkins",
   "buildbot.mariadb.org": "buildbot",
@@ -157,6 +158,34 @@ async  github(url) {
   },
 
   async jenkins(url) {
+    try {
+      const cleanUrl = url.replace(/\/+$/, '');
+      const apiUrl = `${cleanUrl}/api/json?tree=color,lastBuild[result,number,timestamp]`;
+      console.log("Calling Jenkins API:", apiUrl);
+
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Jenkins Response:", data);
+      return data.color && data.color.includes("blue")? "success": "failed";
+      //return data.color && data.color.includes("anime") ? "running" : data.color && data.color.includes("blue")? "success": "failed";
+    } catch (error) {
+      console.error("Error checking CI job status (Jenkins):", error);
+      return "failed";
+    }
+  },
+
+
+  /*async jenkins(url) {
     /* 
     try {
       //jobUrl ="https://ibmz-ci.osuosl.org/job/TensorFlow_IBMZ_CI/";
@@ -187,11 +216,12 @@ async  github(url) {
       console.error("Error checking CI job status:", error);
       return "failed";
     }
-    */
+    *//*remove later
     try {
       //const apiUrl = `${url.replace(/\/$/, "")}/api/json?tree=color,lastBuild[result,number,timestamp]`;
       console.log("Url from jenkins: ", url);
       const apiUrl = `${url}/api/json?tree=color,lastBuild[result,number,timestamp]`;
+      console.log("Jenkins api", apiUrl)
       //const res = await fetch(api);
       const response = await fetch(apiUrl, {
         method: 'GET',
@@ -210,7 +240,7 @@ async  github(url) {
       console.error("Error checking CI job status:", error);
       return "failed";
     }
-  },
+  },*/
 
   async buildbot(url) {
     try {
@@ -232,6 +262,7 @@ async  github(url) {
 function getCITypeFromURL(url) {
   try {
     const domain = new URL(url).hostname;
+    console.log("DOmain",domain)
     return ciDomainMap[domain] || "unknown";
   } catch {
     return "unknown";
@@ -241,8 +272,16 @@ function getCITypeFromURL(url) {
 // Main controller for one CI job
 const ci_check = async (req, res) => {
   try {
-    const jobUrl = req.body.cijob;
+    const jobUrl = req.body.ciJob;
+    console.log("Job url in ci_check.js: ", jobUrl)
+    if(jobUrl === "" || jobUrl =="null")
+    {
+      const platform = null;
+      const handler = null;
+      const status = "empty";
 
+      return res.status(200).json({ url: jobUrl, platform, status });
+    }
     if (!jobUrl) {
       return res.status(400).json({ status: "failed", message: "CI job URL is required" });
     }

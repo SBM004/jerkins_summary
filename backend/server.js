@@ -69,6 +69,6 @@ app.get('/data',(req,res)=>{
 
 app.use('/api/ci',router1)
 app.listen(port,()=>{
-    // console.log(__dirname)
+    console.log(__dirname)
     console.log(`serever is ruuning in port ${port}`)
 })
