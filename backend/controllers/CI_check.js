@@ -146,12 +146,29 @@ async  github(url) {
 
   async circleci(url) {
     try {
-      const match = url.match(/github\/([^/]+\/[^/]+)/);
-      if (!match) return "Invalid CircleCI URL";
-      const api = `https://circleci.com/api/v2/project/github/${match[1]}/pipeline`;
-      const res = await fetch(api);
-      const data = await res.json();
-      return data.items?.[0]?.status || "Unknown";
+      const match = url.match(/^https:\/\/app\.circleci\.com\/pipelines\/github\/([^\/]+)\/([^\/]+)/);
+      if (!match) return { error: "Invalid CircleCI URL" };
+
+      const owner = match[1];
+      const repo = match[2];
+      const pipelineUrl = `https://circleci.com/api/v2/project/github/${owner}/${repo}/pipeline`;
+
+      const headers = {
+        //"Circle-Token": token,
+        "Accept": "application/json",
+      };
+
+      const pipelineRes = await fetch(pipelineUrl, { headers });
+      const pipelineData = await pipelineRes.json();
+      const latestPipeline = pipelineData.items?.[0];
+      if (!latestPipeline) return "No pipelines found";
+
+      const workflowUrl = `https://circleci.com/api/v2/pipeline/${latestPipeline.id}/workflow`;
+      const workflowRes = await fetch(workflowUrl, { headers });
+      const workflowData = await workflowRes.json();
+      const latestWorkflow = workflowData.items?.[0];
+
+      return latestWorkflow?.status || "Unknown";
     } catch (err) {
       return "CircleCI Error: " + err.message;
     }
