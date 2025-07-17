@@ -30,7 +30,7 @@ import express from 'express';
 //import Failedr from "../assets/failedr.jsx";
 // const fetch = require('node-fetch');
 import { URL } from 'url';
-console.log(typeof(fetch))
+console.log(typeof (fetch))
 //console.log("Received body:", req.body);
 // CI domain to platform mapping
 const ciDomainMap = {
@@ -48,101 +48,102 @@ const ciDomainMap = {
   "ci.jenkins.io": "jenkins",
   "ci.wildfly.org": "jenkins",
   "app.travis-ci.com": "travis",
+  "build.gluster.org":"jenkins",
   "prow.k8s.io": "prow",
   "testgrid.k8s.io": "testgrid"
 };
 
 // CI-specific handlers
 const ciHandlers = {
-//   async github(url) {
-//     try {
-//     //   const match = url.match(/github\.com\/([^/]+\/[^/]+)/);
-//       const match = url.match(/^https:\/\/github\.com\/([^\/]+)\/([^\/]+)\/actions(?:\/workflows\/([^\/]+\.ya?ml))?$/);
-//       if (!match) return "Invalid GitHub URL";
-//       const api = `https://api.github.com/${match[1]}/actions/runs`;
-//       const res = await fetch(api);
-//       const data = await res.json();
-//       return data.workflow_runs?.[0]?.conclusion || "Unknown";
-//     } catch (err) {
-//       return "GitHub Error: " + err.message;
-//     }
-//   }
+  //   async github(url) {
+  //     try {
+  //     //   const match = url.match(/github\.com\/([^/]+\/[^/]+)/);
+  //       const match = url.match(/^https:\/\/github\.com\/([^\/]+)\/([^\/]+)\/actions(?:\/workflows\/([^\/]+\.ya?ml))?$/);
+  //       if (!match) return "Invalid GitHub URL";
+  //       const api = `https://api.github.com/${match[1]}/actions/runs`;
+  //       const res = await fetch(api);
+  //       const data = await res.json();
+  //       return data.workflow_runs?.[0]?.conclusion || "Unknown";
+  //     } catch (err) {
+  //       return "GitHub Error: " + err.message;
+  //     }
+  //   }
 
 
 
 
 
 
-// async github(url) {
-//     try {
-//          const match = url.match(/^https:\/\/github\.com\/([^\/]+)\/([^\/]+)\/actions(?:\/workflows\/([^\/]+\.ya?ml))?$/);
-//         if (!match) return "Invalid GitHub URL";
-        
-//         const owner = match[1];
-//         const repo = match[2];
-//         const workflow = match[3]; // This captures the .yml file name
-        
-//         // API URL - NO workflow file in the path!
-//         const api = `https://api.github.com/repos/${owner}/${repo}/actions/runs`;
-//         console.log("API URL:", api);
-        
-//         const res = await fetch(api, {
-//             headers: {
-//                 'User-Agent': 'CI-Status-Checker',
-//                 'Accept': 'application/vnd.github.v3+json'
-//             }
-//         });
-        
-//         if (!res.ok) {
-//             return `GitHub API Error: ${res.status} ${res.statusText}`;
-//         }
-        
-//         const data = await res.json();
-//         return data.workflow_runs?.[0]?.conclusion || "Unknown";
-//     } catch (err) {
-//         return "GitHub Error: " + err.message;
-//     }
-// }
+  // async github(url) {
+  //     try {
+  //          const match = url.match(/^https:\/\/github\.com\/([^\/]+)\/([^\/]+)\/actions(?:\/workflows\/([^\/]+\.ya?ml))?$/);
+  //         if (!match) return "Invalid GitHub URL";
 
-async  github(url) {
+  //         const owner = match[1];
+  //         const repo = match[2];
+  //         const workflow = match[3]; // This captures the .yml file name
+
+  //         // API URL - NO workflow file in the path!
+  //         const api = `https://api.github.com/repos/${owner}/${repo}/actions/runs`;
+  //         console.log("API URL:", api);
+
+  //         const res = await fetch(api, {
+  //             headers: {
+  //                 'User-Agent': 'CI-Status-Checker',
+  //                 'Accept': 'application/vnd.github.v3+json'
+  //             }
+  //         });
+
+  //         if (!res.ok) {
+  //             return `GitHub API Error: ${res.status} ${res.statusText}`;
+  //         }
+
+  //         const data = await res.json();
+  //         return data.workflow_runs?.[0]?.conclusion || "Unknown";
+  //     } catch (err) {
+  //         return "GitHub Error: " + err.message;
+  //     }
+  // }
+
+  async github(url) {
     try {
-        const match = url.match(/^https:\/\/github\.com\/([^\/]+)\/([^\/]+)\/actions(?:\/workflows\/([^\/]+\.ya?ml))?$/);
-        if (!match) return "Invalid GitHub URL";
+      const match = url.match(/^https:\/\/github\.com\/([^\/]+)\/([^\/]+)\/actions(?:\/workflows\/([^\/]+\.ya?ml))?$/);
+      if (!match) return "Invalid GitHub URL";
 
-        const owner = match[1];             
-        const repo = match[2];
-        const workflow = match[3]; // Optional
+      const owner = match[1];
+      const repo = match[2];
+      const workflow = match[3]; // Optional
 
-        const api = `https://api.github.com/repos/${owner}/${repo}/actions/runs`;
-        console.log("API URL:", api);
+      const api = `https://api.github.com/repos/${owner}/${repo}/actions/runs`;
+      console.log("API URL:", api);
 
-        const headers = {
-            'User-Agent': 'CI-Status-Checker',
-            'Accept': 'application/vnd.github.v3+json',
-        };
+      const headers = {
+        'User-Agent': 'CI-Status-Checker',
+        'Accept': 'application/vnd.github.v3+json',
+      };
 
-        // Add Authorization header if token is set
-        if (process.env.GITHUB_TOKEN) {
-            headers['Authorization'] = `Bearer ${process.env.GITHUB_TOKEN}`;
-        }
+      // Add Authorization header if token is set
+      if (process.env.GITHUB_TOKEN) {
+        headers['Authorization'] = `Bearer ${process.env.GITHUB_TOKEN}`;
+      }
 
-        const res = await fetch(api, { headers });
+      const res = await fetch(api, { headers });
 
-        if (!res.ok) {
-            return `GitHub API Error: ${res.status} ${res.statusText}`;
-        }
+      if (!res.ok) {
+        return `GitHub API Error: ${res.status} ${res.statusText}`;
+      }
 
-        const data = await res.json();
-        console.log(data.workflow_runs[0]);
-        return data.workflow_runs?.[0]?.conclusion || "Unknown";
+      const data = await res.json();
+      console.log(data.workflow_runs[0]);
+      return data.workflow_runs?.[0]?.conclusion || "Unknown";
     } catch (err) {
-        return "GitHub Error: " + err.message;
+      return "GitHub Error: " + err.message;
     }
-}
+  }
 
 
 
-,
+  ,
 
   async circleci(url) {
     try {
@@ -193,7 +194,7 @@ async  github(url) {
 
       const data = await response.json();
       console.log("Jenkins Response:", data);
-      return data.color && data.color.includes("blue")? "success": "failed";
+      return data.color && data.color.includes("blue") ? "success" : "failed";
       //return data.color && data.color.includes("anime") ? "running" : data.color && data.color.includes("blue")? "success": "failed";
     } catch (error) {
       console.error("Error checking CI job status (Jenkins):", error);
@@ -234,30 +235,55 @@ async  github(url) {
       return "failed";
     }
     *//*remove later
-    try {
-      //const apiUrl = `${url.replace(/\/$/, "")}/api/json?tree=color,lastBuild[result,number,timestamp]`;
-      console.log("Url from jenkins: ", url);
-      const apiUrl = `${url}/api/json?tree=color,lastBuild[result,number,timestamp]`;
-      console.log("Jenkins api", apiUrl)
-      //const res = await fetch(api);
-      const response = await fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+  try {
+    //const apiUrl = `${url.replace(/\/$/, "")}/api/json?tree=color,lastBuild[result,number,timestamp]`;
+    console.log("Url from jenkins: ", url);
+    const apiUrl = `${url}/api/json?tree=color,lastBuild[result,number,timestamp]`;
+    console.log("Jenkins api", apiUrl)
+    //const res = await fetch(api);
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
       }
-      
-      const data = await res.json();
-       return data.color && data.color.includes("blue") ? "success" : "failed";
-    } catch (error) {
-      console.error("Error checking CI job status:", error);
-      return "failed";
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
     }
-  },*/
+    
+    const data = await res.json();
+     return data.color && data.color.includes("blue") ? "success" : "failed";
+  } catch (error) {
+    console.error("Error checking CI job status:", error);
+    return "failed";
+  }
+},*/
+
+  async travis(url) {
+    try {
+      const match = url.match(/^https:\/\/app\.travis-ci\.com\/github\/([^\/]+)\/([^\/]+)/);
+      if (!match) return { error: "Invalid Travis CI URL" };
+
+      const owner = match[1];
+      const repo = match[2];
+      const branch = "master"; // or detect/allow custom branches
+
+      const badgeUrl = `https://api.travis-ci.com/${owner}/${repo}.svg?branch=${branch}`;
+      const res = await fetch(badgeUrl);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const svgText = await res.text();
+
+      if (svgText.includes("passing")) return "success";
+      if (svgText.includes("failing") || svgText.includes("error")) return "failed";
+
+      return "unknown";
+    } catch (err) {
+      return "TravisCI Error: " + err.message;
+    }
+  },
+
 
   async buildbot(url) {
     try {
@@ -279,7 +305,7 @@ async  github(url) {
 function getCITypeFromURL(url) {
   try {
     const domain = new URL(url).hostname;
-    console.log("DOmain",domain)
+    console.log("DOmain", domain)
     return ciDomainMap[domain] || "unknown";
   } catch {
     return "unknown";
@@ -291,8 +317,7 @@ const ci_check = async (req, res) => {
   try {
     const jobUrl = req.body.ciJob;
     console.log("Job url in ci_check.js: ", jobUrl)
-    if(jobUrl === "" || jobUrl =="null")
-    {
+    if (jobUrl === "" || jobUrl == "null") {
       const platform = null;
       const handler = null;
       const status = "empty";
