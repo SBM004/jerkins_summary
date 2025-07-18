@@ -21,7 +21,7 @@ const ciDomainMap = {
   "ci.hibernate.org": "jenkins",
   "buildbot.mariadb.org": "buildbot",
   "buildbot.python.org": "buildbot",
-  //"ci.jenkins.io": "jenkins",
+  "ci.jenkins.io": "jenkins",
   //"ci.wildfly.org": "jenkins",
   "app.travis-ci.com": "travis",
   "build.gluster.org": "jenkins",
@@ -155,9 +155,105 @@ const ciHandlers = {
     }
   },
 
+  /*async jenkins(url) {
+    async function fetchJson(apiUrl) {
+      const res = await fetch(apiUrl, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} for ${apiUrl}`);
+      }
+
+      return res.json();
+    }
+
+    async function checkJobOrFolder(apiUrl) {
+        const data = await fetchJson(apiUrl);
+
+        // Folder: recurse into jobs
+        if (data.jobs && Array.isArray(data.jobs)) {
+          const results = [];
+
+          for (const job of data.jobs) {
+            if (!job.url) continue;
+            const jobStatus = await checkJobOrFolder(`${job.url}api/json`);
+            results.push({ name: job.name, status: jobStatus });
+          }
+
+          // Prioritize failed > unstable > running > success
+          const firstFailed = results.find(j => j.status === "failed");
+          const firstUnstable = results.find(j => j.status === "unstable");
+          const firstRunning = results.find(j => j.status === "running");
+          const firstSuccess = results.find(j => j.status === "success");
+
+          if (firstFailed) return "failed";
+          if (firstUnstable) return "unstable";
+          if (firstRunning) return "running";
+          if (firstSuccess) return "success";
+          return "unknown";
+        }
+
+        // Job: return status by color
+        const color = data.color || '';
+        if (color.includes("anime")) return "running";
+        if (color.includes("blue")) return "success";
+        if (color.includes("red")) return "failed";
+        if (color.includes("yellow")) return "unstable";
+        if (color.includes("aborted")) return "aborted";
+        return "unknown";
+      }
+
+      try {
+        const cleanUrl = url.replace(/\/+$/, '');
+        const apiUrl = `${cleanUrl}/api/json`;
+        const status = await checkJobOrFolder(apiUrl);
+        return status;
+      } catch (err) {
+        console.error("Error checking Jenkins status:", err);
+        return "failed";
+      }
+  },*/
+
   async jenkins(url) {
     try {
       const cleanUrl = url.replace(/\/+$/, '');
+      if (cleanUrl.includes("jenkins.io"))
+      {
+         try {
+          // Extract words using regex
+          const match = url.match(/job\/([^\/]+)\/job\/([^\/]+)\/job\/([^\/]+)\/?/);
+          if (!match) {
+            throw new Error("Invalid Jenkins folder job URL");
+          }
+
+          const word0 = match[1];
+          const word1 = match[2];
+          const word2 = match[3];
+
+          // Construct the icon status URL
+          const jobPath = `${word0}%2F${word1}%2F${word2}`;
+          const iconUrl = `https://ci.jenkins.io/buildStatus/icon?job=${jobPath}`;
+
+          // Fetch the SVG icon
+          const response = await fetch(iconUrl);
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status} fetching ${iconUrl}`);
+          }
+
+          const svgText = await response.text();
+          console.log("Jenkins io", svgText);
+
+          // Extract status text from SVG (e.g., "Success", "Failure")
+          if (svgText.includes("passing")) return "success";
+          if (svgText.includes("failing") || svgText.includes("error")) return "failed";
+          return "unknown";
+        } catch (err) {
+          console.error("Error checking Jenkins icon status:", err);
+          return "failed";
+        }
+      }
       const apiUrl = `${cleanUrl}/api/json?tree=color,lastBuild[result,number,timestamp]`;
       //console.log("Calling Jenkins API:", apiUrl);
 
@@ -174,7 +270,22 @@ const ciHandlers = {
 
       const data = await response.json();
       // console.log("Jenkins Response:", data);
-      return data.color && data.color.includes("blue") ? "success" : "failed";
+       const color = data.color || '';
+        if (color.includes("anime")) {
+          return "running";
+        } else if (color.includes("blue")) {
+          return "success";
+        } else if (color.includes("red")) {
+          return "failed";
+        } else if (color.includes("yellow")) {
+          return "unstable";
+        } else if (color.includes("aborted")) {
+          return "aborted";
+        } else {
+          return "unknown";
+        }
+
+      //return data.color && data.color.includes("blue") ? "success" : "failed";
       //return data.color && data.color.includes("anime") ? "running" : data.color && data.color.includes("blue")? "success": "failed";
     } catch (error) {
       console.error("Error checking CI job status (Jenkins):", error);
