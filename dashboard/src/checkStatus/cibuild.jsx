@@ -42,6 +42,7 @@ import Passeds from "../assets/passed.jsx";
 import Failedr from "../assets/failedr.jsx";
 import Empty from "../assets/empty.jsx";
 import Running from "../assets/running.jsx";
+import Skipped from "../assets/skipped.jsx"
 
 export const Ci_check = ({ ciJob }) => {
   const [status, setStatus] = useState("loading");
@@ -70,8 +71,23 @@ export const Ci_check = ({ ciJob }) => {
         } else if (data.status === "success") {
           setStatus("passed");
         } else if (data.status === "skipped") {
+        
           setStatus("skipped");
-        } else {
+        }
+        else if (data.status === "cancelled") {
+        
+          setStatus("cancelled");
+        }
+        else if (data.status === "unknown") {
+        
+          setStatus("unknown");
+        }
+        else if (data.status === "running") {
+        
+          setStatus("running");
+        }
+        
+         else {
           setStatus("notfound");
         }
         /*data.color && data.color.includes("anime")*/
@@ -86,7 +102,14 @@ export const Ci_check = ({ ciJob }) => {
 
   if (status === "none") return <Empty />;
   if (status === "running") return <Running />;
-  if (status === "skipped" || status === "notfound") return <Failedr />;
+  if (status === "building") return <Running />;
+  if (status === "cancelled") return 'cancel';
+
+  if (status === "skipped") return <Skipped />;
+  if (status === "notfound") return <Failedr />;
+  if (status === "unknown") return 'unknown';
   if (status === "passed") return <Passeds />;
-  return <Failedr />;
+  if (status === "failed") return <Failedr />;
+
+  
 };
