@@ -7,7 +7,7 @@ export default function Empty() {
         style={{
           width: "6vw",
           height: "3.5vh",
-          left: "2vw",
+          left: "1vw",
           top: 0,
           position: "absolute",
           background: "rgba(138, 138, 138, 0.8)",
@@ -18,7 +18,7 @@ export default function Empty() {
         style={{
           width: "6vw",
           height: "2vh",
-          left: "2.5vw",
+          left: "1.5vw",
           top: "0vh",
           position: "absolute",
           color: "#ffffffff",
@@ -35,7 +35,7 @@ export default function Empty() {
           width: "100%",
           height: "100%",
           top: "0.9vh",
-          left: "2.5vw",
+          left: "1.5vw",
           position: "relative",
         }}
       >

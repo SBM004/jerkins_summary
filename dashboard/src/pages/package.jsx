@@ -36,15 +36,14 @@ export default function PackagePage() {
         return {
           id: index + 1,
           packageName: items.packageName,
-          biBuild: "true",
-          ciBuild: "true",
-          imageBuild: "true",
-          binaryBuild: "true",
           packageOwner: items.owner,
           verification: items.verification,
           ciJob: items.ciJob,
           distrosucc: items.distroSuccess,
           distrofail: items.distroFailure,
+          imageSize:items.imageSize,
+          comment:items.comment
+
         };
       });
       setshowdata(filterdata);
@@ -95,15 +94,17 @@ export default function PackagePage() {
         <div className="w-[10%]">CI Build</div>
         <div className="w-[10%]">Image Build</div>
         <div className="w-[10%]">Binary Build</div>
-        <div className="w-[20%]">Package Owner</div>
+        <div className="w-[10%]">Package Owner</div>
+        <div className="w-[10%]">Image Size</div>
+        <div className="w-[30%]">Comment</div>
       </div>
 
-      <div className="flex flex-col h-full w-full">
+      <div className="flex flex-col min-full w-full">
         {search === "" && showdata ? (
           showdata.map((items, index) => (
             <div
               key={items.id || index}
-              className="text-sm text-center flex flex-row items-center bg-white h-[10vh] py-5 justify-between px-4 border-b"
+              className="text-sm text-center flex flex-row items-center bg-white h-[12vh] py-1 justify-between px-5 border-b"
             >
               {/* for now i have done same condition for ci and image after asking the proper critera make some changes */}
               <div className="w-[6%]">{index + 1}</div>
@@ -122,22 +123,37 @@ export default function PackagePage() {
               <div className="w-[10%]" style={{ height: "2vh" }}>
                 {items.distrofail === "" ? <Passed /> : <Failedr />}
               </div>
-              <div className="w-[20%]">{items.packageOwner}</div>
+              <div className="w-[10%]">{items.packageOwner}</div>
+              <div className="w-[10%] text-xs ">{items.imageSize}</div>
+              <div className="  break-word overflow-y-auto w w-[30%] flex justify-center my-2 items-center h-full text-xs text-center text-align">{items.comment==="" ||  null?"No Comment ":items.comment}</div>
             </div>
           ))
         ) : searchdata && searchdata.length > 0 ? (
           searchdata.map((items, index) => (
-            <div
+          <div
               key={items.id || index}
-              className="text-sm text-center flex flex-row items-center bg-white h-[10vh] py-5 justify-between px-4 border-b"
+              className="text-sm text-center flex flex-row items-center bg-white h-[12vh] py-1 justify-between px-5 border-b"
             >
+              {/* for now i have done same condition for ci and image after asking the proper critera make some changes */}
               <div className="w-[6%]">{index + 1}</div>
               <div className="w-[19%]">{items.packageName}</div>
-              <div className="w-[10%]">{items.biBuild}</div>
-              <div className="w-[10%]">{items.ciBuild}</div>
-              <div className="w-[10%]">{items.imageBuild}</div>
-              <div className="w-[10%]">{items.binaryBuild}</div>
-              <div className="w-[20%]">{items.packageOwner}</div>
+              <div className="w-[10%]" style={{ height: "2vh" }}>
+                {items.distrofail === "" ? <Passed /> : <Failedr />}
+              </div>
+              <div className="w-[10%]">{<Ci_check ciJob={items.ciJob} />}</div>
+              <div className="w-[10%]">
+                {items.distrosucc.toLowerCase().includes("image") ? (
+                  <Passed />
+                ) : (
+                  <Failedr />
+                )}
+              </div>
+              <div className="w-[10%]" style={{ height: "2vh" }}>
+                {items.distrofail === "" ? <Passed /> : <Failedr />}
+              </div>
+              <div className="w-[10%]">{items.packageOwner}</div>
+              <div className="w-[10%] text-xs ">{items.imageSize}</div>
+              <div className="  break-word overflow-y-auto w w-[30%] flex justify-center my-2 items-center h-full text-xs text-center text-align">{items.comment==="" ||  null?"No Comment ":items.comment}</div>
             </div>
           ))
         ) : (
