@@ -9,7 +9,7 @@ import HDI from '../assets/hd';
 export default function Navbar() {
     return (
 
-        <nav className="text-sm bg-white border-gray-200 flex flex-row items-center justify- w-full h-10   flex-nowrap ">
+        <nav className="text-sm   top-0 bg-white border-gray-200 flex flex-row items-center justify- w-full min-h-10   flex-nowrap ">
 
             <div className="leftcontainer pl-5 w-full flex flex-row items-center gap-3">
 
