@@ -84,6 +84,7 @@ export default function PackagePage() {
   }, [search]);*/
   const headers = {
     "Package Name": "packageName",
+    
     "Package Owner": "packageOwner",
     /*
     "Image Size": "imageSize",
