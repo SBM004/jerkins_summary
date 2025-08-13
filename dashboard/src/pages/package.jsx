@@ -1,10 +1,11 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Passed from "../assets/passed.jsx";
 import Failedr from "../assets/failedr.jsx";
 import { Ci_check } from "../checkStatus/cibuild.jsx";
 import Search from "../assets/searchi.jsx";
 import Tabledata from "../components/tabledata.jsx";
+import { getBuildStatus } from "../utils/getBuildStatus.js";
 
 export default function PackagePage() {
   const [data, setData] = useState(null);
@@ -13,6 +14,12 @@ export default function PackagePage() {
   const [searchdata, setSearchdata] = useState(null);
   const [selectedItem, setSelect] = useState(null);
   const [searchKey, setSearchKey] = useState("packageName");
+  const [biFilter, setBiFilter] = useState("all");
+  const [ciFilter, setCiFilter] = useState("all");
+  const [imageFilter, setImageFilter] = useState("all");
+  const [binaryFilter, setBinaryFilter] = useState("all");
+  const [ciStatusMap, setCiStatusMap] = useState({});
+
   useEffect(() => {
     fetch("http://localhost:3000/data")
       .then((response) => {
@@ -84,7 +91,7 @@ export default function PackagePage() {
   }, [search]);*/
   const headers = {
     "Package Name": "packageName",
-    
+
     "Package Owner": "packageOwner",
     /*
     "Image Size": "imageSize",
@@ -103,8 +110,73 @@ export default function PackagePage() {
     }
   }, [search, searchKey, showdata]);
 
+  async function sendStatusToServer(packageName, type, status) {
+    try {
+      await fetch("http://localhost:3000/api/build-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ packageName, type, status }),
+      });
+    } catch (err) {
+      console.error("Error sending status to server:", err);
+    }
+  }
+
+  // Fetch statuses only when data is loaded
+  useEffect(() => {
+    async function fetchStatuses() {
+      const res = await fetch("http://localhost:3000/api/build-status");
+      const statuses = await res.json();
+      setshowdata((prev) =>
+        prev.map((item) => ({
+          ...item,
+          ...statuses[item.packageName], // merge statuses by packageName
+        }))
+      );
+    }
+    if (showdata) fetchStatuses();
+    // Only run when showdata is first set, not on every change
+    // eslint-disable-next-line
+  }, [showdata]);
+
+  function matchesFilter(item, type, filter) {
+    let status;
+    if (type === "ci") {
+      status = ciStatusMap[item.packageName];
+      // Treat "notfound" as "failed" for filtering
+      if (status === "notfound") status = "failed";
+    } else {
+      status = getBuildStatus(type, item);
+    }
+    if (filter === "all") return true;
+    if (filter === "empty") return status === "empty";
+    if (filter === "cancel") return status === "cancel";
+    return status === filter;
+  }
+
+  // Memoized filtered data based on search and all build filters
+  const filteredData = useMemo(() => {
+    const baseData = search === "" && showdata ? showdata : searchdata || [];
+    return baseData.filter(
+      (item) =>
+        matchesFilter(item, "bi", biFilter) &&
+        matchesFilter(item, "ci", ciFilter) &&
+        matchesFilter(item, "image", imageFilter) &&
+        matchesFilter(item, "binary", binaryFilter)
+    );
+  }, [
+    showdata,
+    searchdata,
+    search,
+    biFilter,
+    ciFilter,
+    imageFilter,
+    binaryFilter,
+    ciStatusMap, // <-- add this
+  ]);
+
   return (
-    <div className="relative main overflow-y-auto flex flex-col bg-white max-h-[85vh] m-5 mx-10 mb-10">
+    <div className="relative main overflow-y-auto flex flex-col bg-white max-h-[85vh] m-5 mx-10 mb-10 rounded-sm">
       <div className="flex flex-row items-center justify-between p-5 border-b-2 border-gray-200">
         <p className="text-lg font-semibold">All Packages</p>
         <div className="flex items-center bg-gray-200 rounded-xl overflow-hidden border border-gray-300">
@@ -132,6 +204,70 @@ export default function PackagePage() {
             />
             <Search className="relative left-3 top-2.5 text-gray-500 w-5 h-5" />
           </div>
+        </div>
+      </div>
+
+      <div className="flex flex-row gap-4 px-5 py-2 bg-gray-50 border-b border-gray-200 justify-end items-center">
+        <div>
+          <label className="mr-1 font-semibold">BI:</label>
+          <select
+            value={biFilter}
+            onChange={(e) => setBiFilter(e.target.value)}
+            className="border rounded px-2 py-1"
+          >
+            <option value="all">All</option>
+            <option value="passed">Passed</option>
+            <option value="failed">Failed</option>
+            <option value="empty">Empty</option>
+            <option value="unknown">Unknown</option>
+            <option value="running">Running</option>
+          </select>
+        </div>
+        <div>
+          <label className="mr-1 font-semibold">CI:</label>
+          <select
+            value={ciFilter}
+            onChange={(e) => setCiFilter(e.target.value)}
+            className="border rounded px-2 py-1"
+          >
+            <option value="all">All</option>
+            <option value="passed">Passed</option>
+            <option value="failed">Failed</option>
+            <option value="empty">Empty</option>
+            <option value="cancel">Cancelled</option>
+            <option value="unknown">Unknown</option>
+            <option value="running">Running</option>
+          </select>
+        </div>
+        <div>
+          <label className="mr-1 font-semibold">Image:</label>
+          <select
+            value={imageFilter}
+            onChange={(e) => setImageFilter(e.target.value)}
+            className="border rounded px-2 py-1"
+          >
+            <option value="all">All</option>
+            <option value="passed">Passed</option>
+            <option value="failed">Failed</option>
+            <option value="empty">Empty</option>
+            <option value="unknown">Unknown</option>
+            <option value="running">Running</option>
+          </select>
+        </div>
+        <div>
+          <label className="mr-1 font-semibold">Binary:</label>
+          <select
+            value={binaryFilter}
+            onChange={(e) => setBinaryFilter(e.target.value)}
+            className="border rounded px-2 py-1"
+          >
+            <option value="all">All</option>
+            <option value="passed">Passed</option>
+            <option value="failed">Failed</option>
+            <option value="empty">Empty</option>
+            <option value="unknown">Unknown</option>
+            <option value="running">Running</option>
+          </select>
         </div>
       </div>
 
@@ -172,10 +308,11 @@ export default function PackagePage() {
       </div>
       <div className="content relative overflow-y-auto max-h-[70vh]">
         <div className="flex flex-col min-full w-full">
-          {search === "" && showdata ? (
-            showdata.map((items, index) => (
+          {filteredData.length > 0 ? (
+            filteredData.map((items, index) => (
               <div
-                key={items.id || index}
+                key={items.packageName}
+                //key={items.id || index}
                 className="text-sm text-center flex flex-row items-center bg-white h-[6vh] py-1 justify-between px-5 border-b"
               >
                 {/* for now i have done same condition for ci and image after asking the proper critera make some changes */}
@@ -189,6 +326,45 @@ export default function PackagePage() {
                   {items.packageName}
                 </div>
                 <div className="w-[10%]" style={{ height: "2vh" }}>
+                  {getBuildStatus("bi", items) === "passed" ? (
+                    <Passed />
+                  ) : (
+                    <Failedr />
+                  )}
+                </div>
+
+                <div className="w-[10%]">
+                  <Ci_check
+                    ciJob={items.ciJob}
+                    onStatus={(status) => {
+                      setCiStatusMap((prev) => {
+                        if (prev[items.packageName] === status) return prev; // No change, no update
+                        return {
+                          ...prev,
+                          [items.packageName]: status,
+                        };
+                      });
+                      sendStatusToServer(items.packageName, "ci", status);
+                    }}
+                  />
+                </div>
+
+                <div className="w-[10%]">
+                  {getBuildStatus("image", items) === "passed" ? (
+                    <Passed />
+                  ) : (
+                    <Failedr />
+                  )}
+                </div>
+
+                <div className="w-[10%]" style={{ height: "2vh" }}>
+                  {getBuildStatus("binary", items) === "passed" ? (
+                    <Passed />
+                  ) : (
+                    <Failedr />
+                  )}
+                </div>
+                {/*<div className="w-[10%]" style={{ height: "2vh" }}>
                   {items.distrofail === "" ? <Passed /> : <Failedr />}
                 </div>
                 <div className="w-[10%]">
@@ -203,7 +379,7 @@ export default function PackagePage() {
                 </div>
                 <div className="w-[10%]" style={{ height: "2vh" }}>
                   {items.distrofail === "" ? <Passed /> : <Failedr />}
-                </div>
+                </div>*/}
                 <div className="w-[8%]">{items.packageOwner}</div>
                 <div className="w-[5%] text-[2vh] leading-tight overflow-hidden">
                   {items.imageSize}
@@ -212,73 +388,6 @@ export default function PackagePage() {
                   {items.comment === "" || null ? "No Comment " : items.comment}
                 </div>
               </div>
-            ))
-          ) : searchdata && searchdata.length > 0 ? (
-            searchdata.map((items, index) => (
-              <div
-                key={items.id || index}
-                className="text-sm text-center flex flex-row items-center bg-white h-[6vh] py-1 justify-between px-5 border-b"
-              >
-                {/* for now i have done same condition for ci and image after asking the proper critera make some changes */}
-                <div className="w-[0.5%] ">{index + 1}</div>
-                <div
-                  className="cursor-pointer w-[18%]"
-                  onClick={() => {
-                    setSelect(items);
-                  }}
-                >
-                  {items.packageName}
-                </div>
-                <div className="w-[10%]" style={{ height: "2vh" }}>
-                  {items.distrofail === "" ? <Passed /> : <Failedr />}
-                </div>
-                <div className="w-[10%]">
-                  {<Ci_check ciJob={items.ciJob} />}
-                </div>
-                <div className="w-[10%]">
-                  {items.distrosucc.toLowerCase().includes("image") ? (
-                    <Passed />
-                  ) : (
-                    <Failedr />
-                  )}
-                </div>
-                <div className="w-[10%]" style={{ height: "2vh" }}>
-                  {items.distrofail === "" ? <Passed /> : <Failedr />}
-                </div>
-                <div className="w-[8%]">{items.packageOwner}</div>
-                <div className="w-[5%] text-[2vh] leading-tight overflow-hidden">
-                  {items.imageSize}
-                </div>
-                <div className="  break-word overflow-y-auto w w-[40%]  my-2  h-full text-[1.5vh] font-bold leading-tight">
-                  {items.comment === "" || null ? "No Comment " : items.comment}
-                </div>
-              </div>
-              /*<div
-              key={items.id || index}
-              className="text-sm text-center flex flex-row items-center bg-white h-[12vh] py-1 justify-between px-5 border-b"
-            >
-              {/* for now i have done same condition for ci and image after asking the proper critera make some changes 
-              <div className="w-[6%]">{index + 1}</div>
-              <div className="w-[18%]" onClick={()=>setSelect(items)}>{items.packageName}</div>
-           
-              <div className="w-[10%]" style={{ height: "2vh" }}>
-                {items.distrofail === "" ? <Passed /> : <Failedr />}
-              </div>
-              <div className="w-[10%]">{<Ci_check ciJob={items.ciJob} />}</div>
-              <div className="w-[10%]">
-                {items.distrosucc.toLowerCase().includes("image") ? (
-                  <Passed />
-                ) : (
-                  <Failedr />
-                )}
-              </div>
-              <div className="w-[10%]" style={{ height: "2vh" }}>
-                {items.distrofail === "" ? <Passed /> : <Failedr />}
-              </div>
-              <div className="w-[10%]">{items.packageOwner}</div>
-              <div className="w-[10%] text-xs leading-tight">{items.imageSize}</div>
-              <div className="  break-word overflow-y-auto w w-[30%] flex justify-center my-2 items-center h-full text-xs text-center text-align">{items.comment==="" ||  null?"No Comment ":items.comment}</div>
-            </div>*/
             ))
           ) : (
             <div className="p-4 text-gray-500">No data found</div>

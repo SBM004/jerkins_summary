@@ -110,39 +110,44 @@ const Tabledata = ({ item, setSelect }) => {
   };
 
   return (
-    <div className="absolute border-xl backdrop-blur-[2px] border-black min-h-full min-w-full">
-      <div className="sticky flex flex-col  items-center border-black border-2 bg-white mx-auto rounded-2xl my-[3vh] md:max-w-[30rem] max-h-[70vh] p-10  gap-1 sm:max-w-[20rem]">
-        <div className="PackageName border-2 border-black w-full text-center text-lg font-bold py-2 max-h-[8vh]">
+    <div className="absolute border-xl backdrop-blur-[4px] border-black min-h-full min-w-full">
+      <div className="sticky flex flex-col  items-center bg-white border-gray-400 border-2 mx-auto rounded-2xl my-[6vh] md:max-w-[70rem] max-h-[130vh] p-10  gap-1 sm:max-w-[60rem]">
+        <div
+          className="PackageName 
+  border-[0.5px] border-gray-400 
+  w-full text-center text-lg font-bold 
+  py-3 px-4 max-h-[8vh] 
+  text-black rounded-sm"
+        >
           {packageName}
         </div>
 
-        <div className="Comment border-2 border-black w-full text-sm text-center min-h-[10vh]  max-h-[10.5vh] overflow-y-scroll overflow-x-clip leading-tight">
+        <div className="Comment border-[0.5px] border-gray-400 rounded-sm w-full text-m text-center min-h-[10vh]  max-h-[10.5vh] overflow-y-scroll overflow-x-clip leading-tight">
           {comment || "No comment"}
         </div>
 
-       <div className="DistroGrid w-full border-2 border-black p-2 overflow-y-scroll">
-        <div className="grid grid-cols-5 gap-2 ">
+        <div className="DistroGrid w-full border-[0.5px] border-gray-400 p-2 overflow-y-scroll rounded-sm">
+          <div className="grid grid-cols-5 gap-2 ">
             {allDistros.flat().map((distro, idx) => (
-            <div
+              <div
                 key={idx}
-                className={`rounded py-[0.5vh]  ${getColor(distro)} flex  text-xs text-center`}
-            >
-                <div className="w-full text-center">
-                {distro}
-
-                </div>
-            </div>
+                className={`rounded py-[0.5vh]  ${getColor(
+                  distro
+                )} flex  text-m font-semibold text-center`}
+              >
+                <div className="w-full text-center">{distro}</div>
+              </div>
             ))}
-        </div>
+          </div>
         </div>
         <div className="">
-        <button
-          className=" border-2 border-black rounded-xl px-4 py-1 bg-white hover:bg-gray-100"
-          onClick={() => setSelect(null)}
-        >
-          Cancel
-        </button>
-         </div>
+          <button
+            className=" border-[0.5px] border-gray-400 rounded-md px-4 py-1 bg-white hover:bg-gray-400"
+            onClick={() => setSelect(null)}
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );

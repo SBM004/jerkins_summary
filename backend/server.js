@@ -69,7 +69,25 @@ app.get('/data', (req, res) => {
 // app.use('/ci_checks/packages',ci_route)
 
 app.use('/api/ci', router1)
+
+// In-memory status store (for demo; use DB for production)
+let buildStatuses = {}; // { [packageName]: { bi: 'passed', ci: 'failed', image: 'passed', binary: 'unknown' } }
+
+app.post('/api/build-status', (req, res) => {
+    const { packageName, type, status } = req.body;
+    if (!packageName || !type || !status) {
+        return res.status(400).json({ error: 'Missing fields' });
+    }
+    if (!buildStatuses[packageName]) buildStatuses[packageName] = {};
+    buildStatuses[packageName][type] = status;
+    res.json({ success: true });
+});
+
+app.get('/api/build-status', (req, res) => {
+    res.json(buildStatuses);
+});
+
 app.listen(port, () => {
     console.log(__dirname)
-    console.log(`serever is ruuning in port ${port}`)
+    console.log(`server is running in port ${port}`)
 })
