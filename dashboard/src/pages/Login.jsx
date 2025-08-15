@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import {Link} from "react-router-dom"
 export default function LoginPage({ setIsAuthenticated }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -73,6 +73,7 @@ export default function LoginPage({ setIsAuthenticated }) {
             Login
           </button>
         </form>
+        <Link to="/register">register</Link>
       </div>
     </div>
   );

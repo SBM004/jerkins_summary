@@ -9,6 +9,7 @@ import "./App.css";
 import Navbar from "./components/navbar.jsx";
 import PackagePage from "./pages/package.jsx";
 import LoginPage from "./pages/Login.jsx";
+import {SignUp }from "./pages/signup.jsx";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -34,7 +35,8 @@ function App() {
             element={<LoginPage setIsAuthenticated={setIsAuthenticated} />}
             
           />
-          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="/register" element={<SignUp setIsAuthenticated={setIsAuthenticated}/>} />
+          <Route path="*" element={<Navigate to="/login"/>} />
         </Routes>
       ) : (
         // Show navbar and main app after login
