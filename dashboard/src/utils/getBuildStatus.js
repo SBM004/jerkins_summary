@@ -28,6 +28,11 @@ export function getBuildStatus(type, items) {
         case "binary":
             return items.distrofail === "" ? "passed" : "failed";
 
+        case "docker":
+            return items.distrofail?.toLowerCase().includes("dockerfile")
+                ? "failed"
+                : items.distrosucc?.toLowerCase().includes("dockerfile") ? "passed" : "empty";
+
         default:
             return "unknown";
     }

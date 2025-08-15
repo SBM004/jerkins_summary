@@ -44,7 +44,7 @@ app.get('/data', (req, res) => {
 
 
             }
-            console.log("data read successfully")
+            console.log(`data read successfully date: , ${new Date().toLocaleString()}`)
         })
     }
     catch (err) {
