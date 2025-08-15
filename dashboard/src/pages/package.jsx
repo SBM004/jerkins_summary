@@ -341,7 +341,7 @@ export default function PackagePage() {
                           [items.packageName]: status,
                         };
                       });
-                      sendStatusToServer(items.packageName, "ci", status);
+                      // sendStatusToServer(items.packageName, "ci", status);
                     }}
                   />
                 </div>

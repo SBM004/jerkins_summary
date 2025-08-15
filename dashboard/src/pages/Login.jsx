@@ -4,11 +4,32 @@ export default function LoginPage({ setIsAuthenticated }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async(e) => {
     e.preventDefault(); // stop page reload
     // TODO: Add authentication logic here
     if (username && password) {
-      setIsAuthenticated(true); // Set authenticated to true
+    const result=await fetch("http://localhost:3000/login",{
+      method:"POST",
+      headers:{
+        "Content-Type": "application/json",
+      },
+      credentials:"include",
+      body:JSON.stringify({
+        "email":username,
+        "password":password
+      })
+
+
+    })
+
+    if(result.ok){
+      setIsAuthenticated(true)
+      console.log(result.message)
+    }
+
+    
+    
+      // Set authenticated to true
     } else {
       alert("Please enter username and password");
     }

@@ -110,8 +110,8 @@ const Tabledata = ({ item, setSelect }) => {
   };
 
   return (
-    <div className="absolute border-xl backdrop-blur-[4px] border-black min-h-full min-w-full">
-      <div className="sticky flex flex-col  items-center bg-white border-gray-400 border-2 mx-auto rounded-2xl my-[6vh] md:max-w-[70rem] max-h-[130vh] p-10  gap-1 sm:max-w-[60rem]">
+    <div className="absolute border-xl backdrop-blur-[4px] border-black min-h-full min-w-full ">
+      <div className="sticky mx-auto  flex flex-col  items-center bg-white border-gray-400 border-2  rounded-2xl  md:max-w-[40rem] max-h-[80vh] my-[5vh] p-10  gap-1 sm:max-w-[60rem]">
         <div
           className="PackageName 
   border-[0.5px] border-gray-400 
@@ -126,8 +126,8 @@ const Tabledata = ({ item, setSelect }) => {
           {comment || "No comment"}
         </div>
 
-        <div className="DistroGrid w-full border-[0.5px] border-gray-400 p-2 overflow-y-scroll rounded-sm">
-          <div className="grid grid-cols-5 gap-2 ">
+        <div className="DistroGrid w-full  border-[0.5px] border-gray-400 p-1 overflow-y-scroll rounded-sm text-sm">
+          <div className="grid grid-cols-7 gap-2 ">
             {allDistros.flat().map((distro, idx) => (
               <div
                 key={idx}

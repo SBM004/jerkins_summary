@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import connectDB from './db/connection.js';
 // import {data} from './controllers/package.controller.js';
 import PackageRouter from './routes/package.router.js'
+import UserRouter from './routes/login.route.js'
 // import mongoose from 'mongoose'
 
 // Manually define __dirname in ESM
@@ -20,10 +21,14 @@ const app = express();
 const filepath = path.join(__dirname, 'data', 'summary.json');
 import router1 from './routes/CI_route.js';
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173", // or your React app URL
+  credentials: true
+}));
 connectDB();
 
-app.use("/",PackageRouter);
+app.use("/data",PackageRouter);
+app.use("/login",UserRouter);
 
 // app.get('/data', (req, res) => {
 //     try {
