@@ -28,7 +28,7 @@ app.use(cors({
 connectDB();
 
 app.use("/data",PackageRouter);
-app.use("/login",UserRouter);
+app.use("/",UserRouter);
 
 // app.get('/data', (req, res) => {
 //     try {

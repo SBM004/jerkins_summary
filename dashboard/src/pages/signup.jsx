@@ -6,20 +6,33 @@ export const SignUp=(props)=>{
     const navigate=useNavigate();
     const [email,setEmail]=useState("")
     const [password,setPassword]=useState("")
-    const handleregister=(e)=>{
-        const result=fetch("http://localhost:3000/register",{
-            method:"POST",
-            headers:{
-                "Content-Type":"Application/json"
-            },
-            body:JSON.stringify({
-                "email":email,
-                "password":password
-            })
-        })
+    const handleregister=async (e)=>{
+          e.preventDefault();
+        if(email&&password){
 
-        if(result.ok){
-            navigate("/login");
+            const result= await fetch("http://localhost:3000/register",{
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+                    "email":email,
+                    "password":password
+                })
+            })
+            const data=await result.json();
+    
+            if(result.ok){
+                console.log("ok")
+                navigate("/login");
+            }
+            else{
+                console.log("no")
+                alert( `${data.message}`);
+            }
+        }
+        else{
+            alert("email or password is not typed")
         }
     }
     return (

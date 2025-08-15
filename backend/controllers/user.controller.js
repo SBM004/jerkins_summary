@@ -31,3 +31,29 @@ export const login=async(req,res)=>{
     }
     
 }
+
+export const signup=async(req,res)=>{
+    const email=req.body.email;
+    const password=req.body.password;
+    try{
+        const user=await User.findOne({email:email});
+        if(user){
+            return res.status(500).json({message:"email already used"});
+        }
+        
+        const pass= await  bcrypt.hash(password,10)
+        const result= await User.create({ email: email, password: pass })
+        console.log(result)
+        if(result){
+            return res.status(200).send({message:"success"})
+        }
+        else{
+            return res.status(500).json({message:"something went wrong"});
+        }
+    }
+    catch(err){
+
+        throw err;
+    }
+    
+}
