@@ -6,6 +6,7 @@ import { Ci_check } from "../checkStatus/cibuild.jsx";
 import Search from "../assets/searchi.jsx";
 import Tabledata from "../components/tabledata.jsx";
 import { getBuildStatus } from "../utils/getBuildStatus.js";
+import Empty from "../assets/empty.jsx";
 
 export default function PackagePage() {
   const [data, setData] = useState(null);
@@ -18,6 +19,7 @@ export default function PackagePage() {
   const [ciFilter, setCiFilter] = useState("all");
   const [imageFilter, setImageFilter] = useState("all");
   const [binaryFilter, setBinaryFilter] = useState("all");
+  const [dockerFilter, setDockerFilter] = useState("all");
   const [ciStatusMap, setCiStatusMap] = useState({});
 
   useEffect(() => {
@@ -162,7 +164,8 @@ export default function PackagePage() {
         matchesFilter(item, "bi", biFilter) &&
         matchesFilter(item, "ci", ciFilter) &&
         matchesFilter(item, "image", imageFilter) &&
-        matchesFilter(item, "binary", binaryFilter)
+        matchesFilter(item, "binary", binaryFilter) &&
+        matchesFilter(item, "docker", dockerFilter)
     );
   }, [
     showdata,
@@ -269,6 +272,21 @@ export default function PackagePage() {
             <option value="running">Running</option>
           </select>
         </div>
+        <div>
+          <label className="mr-1 font-semibold">Docker:</label>
+          <select
+            value={dockerFilter}
+            onChange={(e) => setDockerFilter(e.target.value)}
+            className="border rounded px-2 py-1"
+          >
+            <option value="all">All</option>
+            <option value="passed">Passed</option>
+            <option value="failed">Failed</option>
+            <option value="empty">Empty</option>
+            <option value="unknown">Unknown</option>
+            <option value="running">Running</option>
+          </select>
+        </div>
       </div>
 
      
@@ -280,6 +298,7 @@ export default function PackagePage() {
         <div className="w-[10%]">CI Build</div>
         <div className="w-[10%]">Image Build</div>
         <div className="w-[10%]">Binary Build</div>
+        <div className="w-[10%]">Docker Build</div>
         <div className="w-[8%]">Package Owner</div>
         <div className="w-[5%]">Image Size</div>
         <div className="w-[40%]">Comment</div>
@@ -340,6 +359,16 @@ export default function PackagePage() {
                     <Passed />
                   ) : (
                     <Failedr />
+                  )}
+                </div>
+
+                <div className="w-[10%]" style={{ height: "2vh" }}>
+                  {getBuildStatus("docker", items) === "passed" ? (
+                    <Passed />
+                  ) : getBuildStatus("docker", items) === "failed" ? (
+                    <Failedr />
+                  ) : (
+                    <Empty />
                   )}
                 </div>
                 {/*<div className="w-[10%]" style={{ height: "2vh" }}>
