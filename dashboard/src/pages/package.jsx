@@ -177,7 +177,7 @@ export default function PackagePage() {
 
   return (
     <div className="relative main overflow-y-auto flex flex-col bg-white max-h-[85vh] m-5 mx-10 mb-10 rounded-sm">
-      <div className="flex flex-row items-center justify-between p-5 border-b-2 border-gray-200">
+      <div className="flex flex-row items-center justify-between p-5 py-3 border-b-2 border-gray-200">
         <p className="text-lg font-semibold">All Packages</p>
         <div className="flex items-center bg-gray-200 rounded-xl overflow-hidden border border-gray-300">
           <select
@@ -207,7 +207,7 @@ export default function PackagePage() {
         </div>
       </div>
 
-      <div className="flex flex-row gap-4 px-5 py-2 bg-gray-50 border-b border-gray-200 justify-end items-center">
+      <div className="flex flex-row gap-4 px-5 py-1 bg-gray-50 border-b border-gray-200 justify-end items-center">
         <div>
           <label className="mr-1 font-semibold">BI:</label>
           <select
@@ -271,29 +271,7 @@ export default function PackagePage() {
         </div>
       </div>
 
-      {/*<div className="relative main overflow-y-auto flex flex-col bg-white max-h-[85vh] m-5 mx-10 mb-10">
-      {/* <ul>
-
-        {
-            data?data.map((items)=>{
-                <li>items</li>
-            }):<p>no data</p>
-        }
-        </ul> }
-      <div className="flex  flex-row items-center justify-between p-5 border-gray-200 border-b-2">
-        <p>All Packages</p>
-        <div className="relative">
-          <input
-            placeholder="search for package..."
-            value={search}
-            className="text-left rounded-xl bg-gray-200 border-gray-200 border-b-2 pl-10 pr-4"
-            onChange={(e) => {
-              setSearch(e.target.value);
-            }}
-          />
-          <Search />
-        </div>
-      </div>*/}
+     
 
       <div className="text-xs text-center flex flex-row items-center bg-gray-200 h-[6vh] justify-between py-5 px-4 font-semibold text-ellipsis">
         <div className="w-[0.5%]">Sr no.</div>
