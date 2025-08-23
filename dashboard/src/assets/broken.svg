@@ -1,0 +1,11 @@
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Orange filled circle -->
+  <circle cx="10" cy="10" r="9" fill="orange" stroke="darkorange" stroke-width="2"/>
+
+  <!-- Crack path -->
+  <path d="M10 3 L11 6 L9 8 L11 11 L9 13 L11 16 L10 19" 
+        stroke="white" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+</svg>
