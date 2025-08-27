@@ -4,9 +4,17 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 export const login=async(req,res)=>{
     const email=req.body.email;
+    // const username=req.body.email
     const password=req.body.password;
+    let user
     try{
-        const user=await User.findOne({email:email});
+        if(email.includes("@")){
+
+            user=await User.findOne({email:email});
+        }
+        else{
+            user=await User.findOne({username:email});
+        }
         if(!user){
             res.status(500).send({message:"login not successfull"});
         }
@@ -34,15 +42,19 @@ export const login=async(req,res)=>{
 
 export const signup=async(req,res)=>{
     const email=req.body.email;
+    const username=req.body.username;
     const password=req.body.password;
     try{
         const user=await User.findOne({email:email});
         if(user){
             return res.status(500).json({message:"email already used"});
         }
-        
+        const user2=await User.findOne({username:username});
+        if(user2){
+            return res.status(500).json({message:"username already used"});
+        }
         const pass= await  bcrypt.hash(password,10)
-        const result= await User.create({ email: email, password: pass })
+        const result= await User.create({ email: email,username:username, password: pass })
         console.log(result)
         if(result){
             return res.status(200).send({message:"success"})

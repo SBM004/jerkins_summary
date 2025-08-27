@@ -6,9 +6,10 @@ export const SignUp=(props)=>{
     const navigate=useNavigate();
     const [email,setEmail]=useState("")
     const [password,setPassword]=useState("")
+    const [username,setUsername]=useState("")
     const handleregister=async (e)=>{
           e.preventDefault();
-        if(email&&password){
+        if(email&&password&&username){
 
             const result= await fetch("http://localhost:3000/register",{
                 method:"POST",
@@ -17,7 +18,8 @@ export const SignUp=(props)=>{
                 },
                 body:JSON.stringify({
                     "email":email,
-                    "password":password
+                    "password":password,
+                    "username":username
                 })
             })
             const data=await result.json();
@@ -32,7 +34,7 @@ export const SignUp=(props)=>{
             }
         }
         else{
-            alert("email or password is not typed")
+            alert("email or password or username  is not typed")
         }
     }
     return (
@@ -51,6 +53,19 @@ export const SignUp=(props)=>{
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="email"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 mb-2" htmlFor="username">
+              username
+            </label>
+            <input
+              id="username"
+              type="text"
+              className="w-full px-3 py-2 border rounded"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoComplete="username"
             />
           </div>
           <div className="mb-6">

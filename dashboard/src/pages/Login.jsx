@@ -16,15 +16,24 @@ export default function LoginPage({ setIsAuthenticated }) {
       credentials:"include",
       body:JSON.stringify({
         "email":username,
-        "password":password
+        "password":password,
+        "username":username
       })
 
 
-    })
+    }
+    
+  
+  
+  )
+    
 
     if(result.ok){
       setIsAuthenticated(true)
       console.log(result.message)
+    }
+    else{
+      alert("username/email or password is wrong")
     }
 
     
