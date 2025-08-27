@@ -83,7 +83,7 @@ export default function PackagePage() {
         .catch((error) => {
           console.log(error);
         });
-    }, 100000);
+    }, 5000000);
 
     console.log("doing");
     return () => clearInterval(fetching);

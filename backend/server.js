@@ -105,6 +105,13 @@ app.get('/api/build-status', (req, res) => {
     res.json(buildStatuses);
 });
 
+app.post('/logout',(req,res)=>{
+    res.clearCookie('token')
+    res.status(200).send({
+        message:"done"
+    })
+})
+
 app.listen(port, () => {
     console.log(__dirname)
     console.log(`server is running in port ${port}`)

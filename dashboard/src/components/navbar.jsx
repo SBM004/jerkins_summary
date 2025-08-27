@@ -1,11 +1,30 @@
-import React from "react";
+import React,{useState,UseEffect} from "react";
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ChartIcon from "../assets/chart";
 import CubeIcon from "../assets/cube";
 import Activity from "../assets/activity";
 import HDI from "../assets/hd";
 
-export default function Navbar() {
+export default function Navbar({ setIsAuthenticated }) {
+  const navigate=useNavigate()
+  async function logout(){
+    const r=await fetch('http://localhost:3000/logout',{
+      method:'POST',
+      headers:{
+        "Content-Type":"application/json"
+
+      },
+      credentials:'include'
+    })
+    if(r.ok){
+      setIsAuthenticated(false)
+      navigate('/login') 
+
+      console.log(r)
+    }
+   
+  }
   return (
     <nav className="text-sm   top-0 bg-white border-gray-200 flex flex-row items-center justify- w-full min-h-10   flex-nowrap ">
       <div className="leftcontainer pl-5 w-full flex flex-row items-center gap-3">
@@ -54,8 +73,12 @@ export default function Navbar() {
           Distribution
         </NavLink>
       </div>
-      <div className="leftcontainer  flex flex-row items-center pr-10">
-        <p>account</p>
+      <div className="leftcontainer gap-3 flex flex-row items-center pr-10">
+    
+        <p>name</p>  
+        <button class="bg-blue-300 rounded-2xl px-3" onClick={()=>logout() }>logout</button>  
+        
+        
       </div>
     </nav>
   );

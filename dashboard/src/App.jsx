@@ -41,7 +41,7 @@ function App() {
       ) : (
         // Show navbar and main app after login
         <>
-          <Navbar />
+          <Navbar setIsAuthenticated={setIsAuthenticated}/>
           <Routes>
             <Route path="/packages" element={<PackagePage />} />
             <Route path="*" element={<Navigate to="/packages" />} />
